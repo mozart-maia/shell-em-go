@@ -21,7 +21,12 @@ func main() {
 			return
 		}
 
-		output := strings.TrimSpace(command)
+		comlist := strings.Split(command, " ")
+		output := strings.TrimSpace(comlist[0])
+
+		if output == "exit" {
+			os.Exit(0)
+		}
 		fmt.Println(output + ": command not found")
 	}
 
