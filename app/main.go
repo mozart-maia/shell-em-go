@@ -7,27 +7,32 @@ import (
 	"strings"
 )
 
-// Ensures gofmt doesn't remove the "fmt" import in stage 1 (feel free to remove this!)
-var _ = fmt.Print
-
 func main() {
 
 	for {
 		fmt.Print("$ ")
 		reader := bufio.NewReader(os.Stdin)
-		command, err := reader.ReadString('\n')
+		input, err := reader.ReadString('\n')
 
 		if err != nil {
 			return
 		}
 
-		comlist := strings.Split(command, " ")
-		output := strings.TrimSpace(comlist[0])
+		inp_list := strings.Split(input, " ")
+		command := strings.TrimSpace(inp_list[0])
 
-		if output == "exit" {
+		if command == "exit" {
 			os.Exit(0)
 		}
-		fmt.Println(output + ": command not found")
+		if command == "echo" {
+			inp_list = inp_list[1:]
+			echo_output := strings.Join(inp_list, " ")
+			fmt.Print(echo_output)
+
+		} else {
+			fmt.Println(command + ": command not found")
+		}
+
 	}
 
 }
