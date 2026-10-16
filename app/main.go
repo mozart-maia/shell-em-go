@@ -4,7 +4,9 @@ import (
 	"bufio"
 	"fmt"
 	"os"
+	"os/exec"
 	"strings"
+	"unicode"
 )
 
 func main() {
@@ -36,13 +38,14 @@ func main() {
 		}
 
 		if command == "type" {
-			com_described := inp_list[1]
-			is_com := built_ins_contain(built_ins, com_described)
-			if is_com == true {
-				fmt.Println(com_described + " is a shell builtin")
-			} else {
-				fmt.Println(com_described + ": not found")
-			}
+			// com_described := inp_list[1]
+			// is_com := built_ins_contain(built_ins, com_described)
+			// if is_com == true {
+			// 	fmt.Println(com_described + " is a shell builtin")
+			// } else {
+			// 	fmt.Println(com_described + ": not found")
+			// }
+			type_com(inp_list, built_ins)
 			continue
 		}
 
@@ -59,4 +62,27 @@ func built_ins_contain(b_ins []string, arg string) bool {
 		}
 	}
 	return false
+}
+
+func type_com(inp_list []string, built_ins []string) {
+	com_described := inp_list[1]
+	is_com := built_ins_contain(built_ins, com_described)
+	if is_com == true {
+		fmt.Println(com_described + " is a shell builtin")
+	} else {
+		com_described = strings.TrimFunc(com_described, func(r rune) bool {
+			return !unicode.IsGraphic(r)
+		})
+		path, err := exec.LookPath(com_described)
+		if err != nil {
+			// log.Fatal(err)
+			fmt.Println(com_described + ": not found")
+
+		} else {
+			fmt.Println(com_described + " is " + path)
+
+		}
+
+	}
+
 }
