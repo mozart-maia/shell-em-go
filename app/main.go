@@ -3,7 +3,6 @@ package main
 import (
 	"bufio"
 	"fmt"
-	"log"
 	"os"
 	"os/exec"
 	"strings"
@@ -42,21 +41,16 @@ func main() {
 			continue
 		}
 
-		path_exe := is_exec(command)
-
-		if path_exe != "not found" {
-			args := []string(inp_list[1:])
-			cmd := exec.Command(command, args...)
-			resultado, err := cmd.CombinedOutput()
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			// Convertemos os bytes para texto (string) para conseguir ler
-			fmt.Print(string(resultado))
+		args := []string(inp_list[1:])
+		cmd := exec.Command(command, args...)
+		resultado, err := cmd.CombinedOutput()
+		if err != nil {
+			fmt.Println(command + ": command not found")
 			continue
 		}
-		fmt.Println(command + ": command not found")
+
+		fmt.Print(string(resultado))
+
 	}
 }
 
@@ -83,15 +77,5 @@ func type_com(inp_list []string, built_ins []string) {
 		} else {
 			fmt.Println(com_described + " is " + path)
 		}
-	}
-}
-
-func is_exec(command string) string {
-	path, err := exec.LookPath(command)
-	if err != nil {
-		// log.Fatal(err)
-		return "not found"
-	} else {
-		return path
 	}
 }
