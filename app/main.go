@@ -3,10 +3,10 @@ package main
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"strings"
-	"unicode"
 )
 
 func main() {
@@ -23,13 +23,13 @@ func main() {
 		}
 
 		input = strings.TrimSpace(input)
-
 		inp_list := strings.Fields(input)
 		command := strings.TrimSpace(inp_list[0])
 
 		if command == "exit" {
 			os.Exit(0)
 		}
+
 		if command == "echo" {
 			inp_list = inp_list[1:]
 			echo_output := strings.Join(inp_list, " ")
@@ -38,21 +38,26 @@ func main() {
 		}
 
 		if command == "type" {
-			// com_described := inp_list[1]
-			// is_com := built_ins_contain(built_ins, com_described)
-			// if is_com == true {
-			// 	fmt.Println(com_described + " is a shell builtin")
-			// } else {
-			// 	fmt.Println(com_described + ": not found")
-			// }
 			type_com(inp_list, built_ins)
 			continue
 		}
 
+		path_exe := is_exec(command)
+
+		if path_exe != "not found" {
+			args := []string(inp_list[1:])
+			cmd := exec.Command(command, args...)
+			resultado, err := cmd.CombinedOutput()
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			// Convertemos os bytes para texto (string) para conseguir ler
+			fmt.Print(string(resultado))
+			continue
+		}
 		fmt.Println(command + ": command not found")
-
 	}
-
 }
 
 func built_ins_contain(b_ins []string, arg string) bool {
@@ -70,19 +75,23 @@ func type_com(inp_list []string, built_ins []string) {
 	if is_com == true {
 		fmt.Println(com_described + " is a shell builtin")
 	} else {
-		com_described = strings.TrimFunc(com_described, func(r rune) bool {
-			return !unicode.IsGraphic(r)
-		})
+
 		path, err := exec.LookPath(com_described)
 		if err != nil {
 			// log.Fatal(err)
 			fmt.Println(com_described + ": not found")
-
 		} else {
 			fmt.Println(com_described + " is " + path)
-
 		}
-
 	}
+}
 
+func is_exec(command string) string {
+	path, err := exec.LookPath(command)
+	if err != nil {
+		// log.Fatal(err)
+		return "not found"
+	} else {
+		return path
+	}
 }
